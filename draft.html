@@ -450,78 +450,126 @@
   }
 </style>
 </head>
-<body>
 
-<!-- ── HEADER ────────────────────────────────────── -->
+<body>
+ 
+<!-- ── HEADER ─────────────────────────────────────── -->
 <header>
   <div class="header-inner">
-    <div class="venue-badge">NeurIPS 2026 Workshop &nbsp;·&nbsp; Sydney, Australia</div>
-    <h1>MedCompute 2026:<br><em>Compute-Accelerated Foundation<br>Models for Medical Imaging</em></h1>
-    <p class="header-sub">A full-day workshop at NeurIPS 2026 bridging GPU-native reconstruction, foundation model science, and real-world clinical deployment.</p>
-    <div class="organizer-chips">
-      <div class="chip">Oge Marques <span>NVIDIA</span></div>
-      <div class="chip">Tomasz Bednarz <span>NVIDIA</span></div>
-      <div class="chip">Judy Wawira Gichoya <span>Emory University</span></div>
-      <div class="chip">Olivier Salvado <span>QUT</span></div>
-      <div class="chip">Soon Ki Jung <span>Kyungpook National University</span></div>
+    <div class="workshop-badge">NeurIPS 2026 Workshop · Sydney, Australia</div>
+    <h1>MedCompute 2026:<br><em>Compute-Accelerated Foundation Models for Medical Imaging</em></h1>
+    <p class="header-tagline">Compute meets clinic: GPU-accelerated reconstruction, foundation model pre-training, and robust deployment for real-world medical AI.</p>
+    <div class="organizer-list">
+      <div class="org-pill"><span class="org-name">Oge Marques</span><span class="org-affil">NVIDIA</span></div>
+      <div class="org-pill"><span class="org-name">Tomasz Bednarz</span><span class="org-affil">NVIDIA</span></div>
+      <div class="org-pill"><span class="org-name">Judy Wawira Gichoya</span><span class="org-affil">Emory University</span></div>
+      <div class="org-pill"><span class="org-name">Olivier Salvado</span><span class="org-affil">QUT</span></div>
+      <div class="org-pill"><span class="org-name">Soon Ki Jung</span><span class="org-affil">Kyungpook National University</span></div>
     </div>
+    <nav>
+      <a href="#motivation">Motivation</a>
+      <a href="#topics">Topics</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#speakers">Speakers</a>
+      <a href="#organizers">Organizers</a>
+      <a href="#committee">Program Committee</a>
+    </nav>
   </div>
 </header>
-
-<!-- ── NAV ───────────────────────────────────────── -->
-<nav>
-  <ul>
-    <li><a href="#motivation">Motivation</a></li>
-    <li><a href="#topics">Topics</a></li>
-    <li><a href="#schedule">Schedule</a></li>
-    <li><a href="#committee">Program Committee</a></li>
-  </ul>
-</nav>
-
-<!-- ── MAIN ──────────────────────────────────────── -->
+ 
 <main>
-
+ 
   <!-- MOTIVATION -->
   <section id="motivation">
     <p class="section-label">Topic &amp; Motivation</p>
-    <h2>Why Now, Why Sydney</h2>
-    <p class="lead">Over 4 billion medical imaging studies are performed annually worldwide, yet fewer than 10% are routinely assisted by AI at the point of care. The compute infrastructure to close that gap now exists. What the community still lacks is scientific agreement on how to build on top of it correctly: robustly, safely, and at clinical scale.</p>
-    <p>Large-scale visual foundation models (FMs) demonstrate remarkable zero-shot transfer across CT, MRI, pathology, and fundus imaging, and some already match or exceed specialist performance on structured tasks. Yet a 2026 cross-sectional study found that frontier multimodal models achieved only ~57.5% accuracy on clinical visual–textual questions, far below expert ophthalmologists, and an international review of 390 clinical AI tools found 98% still in the research phase with only 2% clinically deployed. The bottleneck is not data or architecture alone — it is the absence of <strong>compute-aware design principles</strong> that make FMs robust, efficient, and deployable across diverse real-world clinical environments.</p>
-
+    <h2>Why This Workshop, Why Now</h2>
+    <p>An estimated 4.2 billion medical imaging studies are performed annually worldwide, yet despite the U.S. Food and Drug Administration clearing over 1,000 AI/ML-enabled medical devices, real-world clinical deployment remains a negligible fraction of global workflows. The compute infrastructure necessary to close that gap — GPU-accelerated reconstruction pipelines, real-time edge inference, and scalable foundation model (FM) pretraining — now exists. What the community still lacks is scientific agreement on how to utilize this computational layer to build systems that are robust, verifiable, and safe at global clinical scale. MedCompute 2026 is where that systematic work begins.</p>
+    <p>Large-scale visual FMs demonstrate remarkable zero-shot transfer across diverse clinical modalities, with specialized architectures matching or exceeding specialist performance on structured diagnostic tasks. Yet generalized robustness remains fragile: a comprehensive 2025 benchmark (LMOD+) evaluating 24 state-of-the-art multimodal large language models found that frontier architectures achieved only ~57.8% accuracy on ophthalmic disease screening under zero-shot conditions, with performance collapsing toward random baselines on complex staging tasks. The vast majority of clinical AI tools remain trapped in the research phase, or fail post-deployment due to uncharacterized distribution shifts and calibration errors. The bottleneck is not data or architecture alone — it is the absence of <strong>compute-aware design principles</strong> that make FMs robust, efficient, and deployable across heterogeneous real-world clinical environments.</p>
+ 
+    <h3>Open Problems This Workshop Addresses</h3>
+    <p>MedCompute 2026 is organized around three open problems the community has not yet systematically solved:</p>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="problem-num">01</div>
+        <div class="problem-title">Compute-aware model design</div>
+        <div class="problem-body">How GPU memory constraints, reconstruction latency, and edge inference budgets should inform FM architecture and training — currently largely ignored in practice.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02</div>
+        <div class="problem-title">Closing the robustness gap</div>
+        <div class="problem-body">How to build evaluation frameworks that predict real-world clinical performance, not just benchmark accuracy, under distribution shift and scanner heterogeneity.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03</div>
+        <div class="problem-title">Verified clinical deployment</div>
+        <div class="problem-body">What a compute-to-clinic pipeline looks like when it must simultaneously satisfy regulatory, privacy, and equity constraints.</div>
+      </div>
+    </div>
+ 
     <h3>Three Converging Factors in 2026</h3>
-    <p><strong>Compute platforms are clinical-ready.</strong> NVIDIA's medical AI stack — MONAI, Holoscan (FDA-cleared for surgical devices in 2025), Clara, and BioNeMo — represents the first fully integrated compute-to-clinic pipeline for medical imaging.</p>
-    <p><strong>FMs are powerful but not yet trustworthy.</strong> The performance frontier is advancing while the robustness and deployment frontier lags; this gap is the workshop's core scientific problem.</p>
-    <p><strong>The Sydney moment.</strong> NeurIPS 2026 in Sydney is a rare convergence of a flagship global AI conference on Asia-Pacific soil. Australia is home to world-class medical imaging institutions — QUT, CSIRO, NIF, ANSTO, the University of Sydney — and AI-native clinical companies including Harrison.ai. MedCompute 2026 is designed to bring this ecosystem into direct conversation with the global NeurIPS community.</p>
+    <p><strong>Edge compute platforms are achieving clinical readiness.</strong> 2025 marked a watershed moment for medical AI infrastructure, as high-performance edge platforms achieved regulatory clearance for real-time intraoperative use. Open-source, domain-specific frameworks now support multimodal inference directly at the point of care. The infrastructure is ready; the foundational algorithmic science must now catch up.</p>
+    <p><strong>The deployment and validation frontier severely lags.</strong> While in silico performance metrics advance rapidly, real-world robustness remains brittle. Recent analyses show that fewer than 30% of FDA-authorized radiology AI devices have undergone any clinical testing, with only 5% subject to rigorous prospective evaluation. Closing this trust deficit through verifiable, hardware-aware model design and federated evaluation is the workshop's core scientific mandate.</p>
+    <p><strong>The Sydney moment.</strong> NeurIPS 2026 in Sydney represents a rare convergence of a flagship global machine learning conference on Asia-Pacific soil. Australia is home to world-class medical imaging institutions — QUT, CSIRO, NIF, ANSTO, and the University of Sydney — and AI-native clinical companies such as Annalise.ai and Harrison.ai. MedCompute 2026 is explicitly designed to bring this ecosystem into direct, collaborative conversation with the global NeurIPS community.</p>
+ 
+    <h3>Differentiation from Related Workshops</h3>
+    <div class="diff-grid">
+      <div class="diff-item">
+        <div class="diff-label">Compute-first framing</div>
+        <div class="diff-body">Existing workshops treat compute as background infrastructure. MedCompute 2026 inverts this: compute-aware design — GPU-native reconstruction, hardware-software co-design, and real-time edge inference — is the primary scientific object of study. A paper on MRI acceleration that ignores reconstruction latency on clinical hardware would be out of scope here.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-label">Full pipeline scope</div>
+        <div class="diff-body">Recent series (e.g., AIM-FM at NeurIPS) focus on FM pretraining; the MICCAI ecosystem targets specific bottlenecks in isolation. MedCompute 2026 covers the full arc from GPU-accelerated reconstruction through FM pretraining to robustness under distribution shift and real-world deployment — treating each stage as an interconnected bottleneck in a single unified pipeline.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-label">3D/volumetric native</div>
+        <div class="diff-body">CT, MRI, PET/CT, and ultrasound are fundamentally volumetric. The costs of volumetric attention can no longer be bypassed by 2D slicing, which destroys spatial context and introduces avoidable artifacts. Our program centers 3D ViTs, Mamba and State Space Models, and implicit neural representations as first-class topics.</div>
+      </div>
+    </div>
   </section>
-
+ 
   <hr>
-
+ 
   <!-- TOPICS -->
   <section id="topics">
     <p class="section-label">Scope</p>
     <h2>Topics of Interest</h2>
     <p>We invite submissions across the following interconnected themes. Full research contributions, position papers, negative results, dataset releases, and infrastructure papers are all explicitly encouraged.</p>
     <div class="topics-grid">
-      <div class="topic-card">GPU-accelerated image reconstruction — deep unrolling, learned priors, diffusion-based methods for CT, MRI, PET/CT, and ultrasound</div>
-      <div class="topic-card">Foundation model pre-training for medical imaging — self-supervised objectives, multimodal pre-training, scaling laws, open-source FM releases</div>
-      <div class="topic-card">Multimodal AI for clinical decision support — vision–language models, cross-modal retrieval, clinical report generation</div>
-      <div class="topic-card">Synthetic data &amp; generative models — diffusion-based synthesis, privacy preservation, rare pathology simulation, regulatory considerations</div>
-      <div class="topic-card">Evaluation, benchmarking &amp; robustness — distribution shift, evaluation beyond AUC, dataset curation, prospective vs. retrospective validation</div>
-      <div class="topic-card">3D and volumetric vision — architectures native to volumetric data, efficient attention, anatomy-aware losses, cross-modality alignment</div>
-      <div class="topic-card">Interpretability &amp; uncertainty quantification — calibration, conformal prediction, concept-based explanations, human–AI collaboration</div>
-      <div class="topic-card">Surgical &amp; endoscopic video AI — foundation models for workflow recognition, real-time edge inference, endoscopic benchmarks</div>
-      <div class="topic-card">Clinical deployment &amp; medical AI systems — federated learning, edge inference, workflow integration, Green AI</div>
-      <div class="topic-card">Regulatory pathways &amp; governance — FDA, CE Mark under EU AI Act, TGA considerations, post-market surveillance</div>
+      <div class="topic-item">
+        <div class="topic-title">GPU-accelerated image reconstruction</div>
+        <div class="topic-body">Deep unrolling, learned priors, and diffusion-based methods for CT, MRI, PET/CT, and ultrasound; hardware-software co-design; acceleration benchmarks.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Foundation model pre-training for medical imaging</div>
+        <div class="topic-body">Self-supervised and contrastive objectives; multimodal (image–report–genomic) pre-training; scaling laws; open-source FM releases.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Multimodal AI and generative models</div>
+        <div class="topic-body">Vision–language models integrating imaging with radiology reports, EHRs, genomics; clinical report generation; diffusion-based synthesis for augmentation, privacy, and rare pathology simulation.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">3D and volumetric vision</div>
+        <div class="topic-body">Architectures native to volumetric data (3D ViTs, Mamba, implicit neural representations); efficient volumetric attention; anatomy- and topology-aware losses; cross-modality 3D alignment.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Evaluation, robustness, and interpretability</div>
+        <div class="topic-body">Distribution shift across scanners, sites, and populations; evaluation beyond AUC; dataset curation and bias auditing; conformal prediction; concept-based explanations; human–AI collaboration.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Clinical deployment, regulatory pathways, and governance</div>
+        <div class="topic-body">Federated and privacy-preserving learning; edge inference on surgical and diagnostic devices; FDA 510(k), CE Mark under EU AI Act, TGA considerations; Green AI; post-market surveillance.</div>
+      </div>
     </div>
   </section>
-
+ 
   <hr>
-
+ 
   <!-- SCHEDULE -->
   <section id="schedule">
     <p class="section-label">Program</p>
     <h2>Workshop Schedule</h2>
-    <p>A full-day in-person workshop designed around a deliberate two-act narrative: the morning establishes the compute foundation; the afternoon translates it to the clinic.</p>
+    <p>A full-day in-person workshop structured around alternating focused talks and interactive discussion. The morning establishes the compute foundation; the afternoon translates it to the clinic.</p>
     <div class="schedule">
       <div class="schedule-row">
         <div class="sched-time">09:00–09:15</div>
@@ -537,7 +585,7 @@
       </div>
       <div class="schedule-row">
         <div class="sched-time">10:30–11:20</div>
-        <div class="sched-session"><strong>Invited Talks I</strong> — 2 × 25 min <span class="sched-tag tag-invited">Invited</span> <span style="display:block;font-size:13px;color:var(--muted);margin-top:3px;">Compute foundation: GPU-accelerated reconstruction &amp; FM pre-training</span></div>
+        <div class="sched-session"><strong>Invited Talks I</strong> — 2 × 20 min + Q&amp;A <span class="sched-tag tag-invited">Invited</span><span class="sched-sub">Compute foundation: GPU-accelerated reconstruction &amp; FM pre-training</span></div>
       </div>
       <div class="schedule-row discussion">
         <div class="sched-time">11:20–12:00</div>
@@ -557,7 +605,7 @@
       </div>
       <div class="schedule-row">
         <div class="sched-time">15:00–15:50</div>
-        <div class="sched-session"><strong>Invited Talks II</strong> — 2 × 25 min <span class="sched-tag tag-invited">Invited</span> <span style="display:block;font-size:13px;color:var(--muted);margin-top:3px;">Clinical translation: robustness, deployment &amp; regulatory pathways</span></div>
+        <div class="sched-session"><strong>Invited Talks II</strong> — 2 × 20 min + Q&amp;A <span class="sched-tag tag-invited">Invited</span><span class="sched-sub">Clinical translation: robustness, deployment &amp; regulatory pathways</span></div>
       </div>
       <div class="schedule-row panel">
         <div class="sched-time">15:50–16:45</div>
@@ -569,73 +617,166 @@
       </div>
     </div>
   </section>
+ 
   <hr>
-
-<!-- PROGRAM COMMITTEE -->
-<section id="committee">
-  <p class="section-label">Program Committee</p>
-  <h2>Confirmed Members</h2>
-
-  <div class="pc-grid">
-    <div class="pc-card">
-      <div class="pc-name">Ge Wang</div>
-      <div class="pc-affil">Rensselaer Polytechnic Institute, USA</div>
-      <div class="pc-area">CT/MRI reconstruction · imaging AI</div>
+ 
+  <!-- SPEAKERS -->
+  <section id="speakers">
+    <p class="section-label">Invited Speakers</p>
+    <h2>Speaker Lineup</h2>
+    <div class="speakers-note">Confirmations are in progress. This page will be updated as speakers confirm. Additional invitations are being extended for the AU/APAC keynote, one additional morning talk, and two afternoon talks.</div>
+    <div class="speaker-list">
+      <div class="speaker-card">
+        <div class="speaker-star">★</div>
+        <div class="speaker-info">
+          <div class="speaker-name">Sajid Javed <span class="speaker-slot">Morning session · Confirmed</span></div>
+          <div class="speaker-affil">Khalifa University of Science and Technology, UAE</div>
+          <div class="speaker-area">Multimodal foundation models for computational pathology and histopathological image analysis</div>
+        </div>
+      </div>
+      <div class="speaker-placeholder">AU/APAC keynote — invitation in progress via Olivier Salvado</div>
+      <div class="speaker-placeholder">Morning slot 2 — invitation in progress (compute / FM pre-training track)</div>
+      <div class="speaker-placeholder">Afternoon slot 1 — invitation in progress (clinical translation track)</div>
+      <div class="speaker-placeholder">Afternoon slot 2 — invitation in progress (clinical translation track)</div>
     </div>
-    <div class="pc-card">
-      <div class="pc-name">Alexandre Falcão</div>
-      <div class="pc-affil">University of Campinas (UNICAMP), Brazil</div>
-      <div class="pc-area">Image processing · pattern recognition</div>
+  </section>
+ 
+  <hr>
+ 
+  <!-- DIVERSITY -->
+  <section id="diversity">
+    <p class="section-label">Diversity &amp; Inclusion</p>
+    <h2>Our Commitment</h2>
+    <p>Diversity is a design constraint of this workshop, not an afterthought.</p>
+    <div class="diversity-grid">
+      <div class="div-item">
+        <div class="div-label">Organizers</div>
+        <div class="div-body">The team spans three countries (USA, Australia, and South Korea) and targets ≥40% female representation.</div>
+      </div>
+      <div class="div-item">
+        <div class="div-label">Invited Speakers</div>
+        <div class="div-body">Targeting ≥40% female speakers. Invitations are extended with explicit attention to geographic, gender, and career-stage diversity, targeting researchers from North America, Europe, Asia-Pacific, and the Global South.</div>
+      </div>
+      <div class="div-item">
+        <div class="div-label">Program Committee</div>
+        <div class="div-body">Will include researchers from at least 10 countries, with ≥35% female members, drawn from the MICCAI, CVPR medical vision, and AIM-FM communities.</div>
+      </div>
+      <div class="div-item">
+        <div class="div-label">Submissions</div>
+        <div class="div-body">Registration fees waived for accepted authors from low- and middle-income countries. At least two spotlight slots designated for early-career researchers.</div>
+      </div>
+      <div class="div-item">
+        <div class="div-label">Panel</div>
+        <div class="div-body">Will include at least one clinician from the Global South, reflecting our commitment to equitable AI deployment.</div>
+      </div>
     </div>
-    <div class="pc-card">
-      <div class="pc-name">Felipe Kitamura</div>
-      <div class="pc-affil">Eden, Palo Alto, CA / UNIFESP, São Paulo, Brazil</div>
-      <div class="pc-area">Radiology AI · clinical deployment</div>
+  </section>
+ 
+  <hr>
+ 
+  <!-- ORGANIZERS -->
+  <section id="organizers">
+    <p class="section-label">Organizing Team</p>
+    <h2>Organizers</h2>
+    <div class="organizer-cards">
+ 
+      <div class="org-card">
+        <div class="org-card-name">Oge Marques</div>
+        <div class="org-card-title">NVAITC Senior Scientist, NVIDIA AI Technology Centre; Emeritus Professor of Engineering and Computer Science, Florida Atlantic University</div>
+        <div class="org-card-bio">Oge Marques works at the interface of academic research and NVIDIA's AI stack, focusing on medical imaging and foundation models. He is Emeritus Professor of Engineering and Computer Science at Florida Atlantic University, where he taught and led research in visual AI and medical image analysis for over two decades, supervising 10 PhD and 17 Master's students to completion. His editorial service includes membership on the Editorial Board of <em>Multimedia Tools and Applications</em> (Springer, 2012–2024), and he serves as Book Series Editor for <em>Applied Machine Learning</em> (Springer, 2021–present). His professional service includes his current role as Chair of the Recognition and Awards Committee of the IEEE Palm Beach Section, Senior Membership in both IEEE and ACM, and active membership in SIIM, RSNA, EuSoMII, ESR, and AMIA. He is a Leshner Leadership Institute Public Engagement Fellow of the AAAS. His involvement brings direct access to NVIDIA's medical AI compute stack — including MONAI, Holoscan, Clara, and BioNeMo — as well as a long-standing research network spanning four continents.</div>
+      </div>
+ 
+      <div class="org-card">
+        <div class="org-card-name">Tomasz Bednarz</div>
+        <div class="org-card-title">Director of Strategic Research Collaboration, NVIDIA AI Technology Centre; Visiting Scientist at CSIRO; Adjunct Professor at University of Queensland</div>
+        <div class="org-card-bio">Tomasz Bednarz is the Director of Strategic Research Collaboration and Special Projects at NVIDIA AI Technology Centre, leading a team focused on driving the adoption of cutting-edge NVIDIA technologies in computationally intensive scientific research. His background spans computational science, physics, computational imaging, visualization, and HPC. He brings to MedCompute 2026 direct access to NVIDIA's medical AI compute stack — including MONAI, Holoscan, Clara, and BioNeMo — as well as deep ties to the Australian research computing ecosystem through CSIRO and national infrastructure partners including NIF and Pawsey. He has co-organized workshops and symposia at SIGGRAPH, IEEE VIS, and eResearch Australasia, and has over 20 years of experience bridging academic research and industrial deployment of AI systems.</div>
+      </div>
+ 
+      <div class="org-placeholder">
+        <div class="org-card-name">Judy Wawira Gichoya</div>
+        Associate Professor, Department of Radiology and Imaging Sciences, Emory University School of Medicine — <em>bio forthcoming</em>
+      </div>
+ 
+      <div class="org-placeholder">
+        <div class="org-card-name">Olivier Salvado</div>
+        QUT AI in Health Research Network, Faculty of Engineering, Queensland University of Technology — <em>bio forthcoming</em>
+      </div>
+ 
+      <div class="org-placeholder">
+        <div class="org-card-name">Soon Ki Jung</div>
+        Professor, School of Computer Science and Engineering, Kyungpook National University — <em>bio forthcoming</em>
+      </div>
+ 
     </div>
-    <div class="pc-card">
-      <div class="pc-name">Peter van Ooijen</div>
-      <div class="pc-affil">University Medical Center Groningen (UMCG), Netherlands</div>
-      <div class="pc-area">AI in radiotherapy · medical imaging informatics</div>
+  </section>
+ 
+  <hr>
+ 
+  <!-- PROGRAM COMMITTEE -->
+  <section id="committee">
+    <p class="section-label">Program Committee</p>
+    <h2>Confirmed Members</h2>
+    <p class="pc-intro">We are targeting a final PC of 25–30 members with representation from at least 10 countries and ≥35% female members.</p>
+    <div class="pc-grid">
+      <div class="pc-card">
+        <div class="pc-name">Ge Wang</div>
+        <div class="pc-affil">Rensselaer Polytechnic Institute, USA</div>
+        <div class="pc-area">CT/MRI reconstruction · imaging AI</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Alexandre Falcão</div>
+        <div class="pc-affil">University of Campinas (UNICAMP), Brazil</div>
+        <div class="pc-area">Image processing · pattern recognition</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Felipe Kitamura</div>
+        <div class="pc-affil">Eden, Palo Alto, CA / UNIFESP, São Paulo, Brazil</div>
+        <div class="pc-area">Radiology AI · clinical deployment</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Peter van Ooijen</div>
+        <div class="pc-affil">University Medical Center Groningen (UMCG), Netherlands</div>
+        <div class="pc-area">AI in radiotherapy · medical imaging informatics</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Elena Sizikova</div>
+        <div class="pc-affil">U.S. Food and Drug Administration (FDA), USA</div>
+        <div class="pc-area">Regulatory science · robustness</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Issam El Naqa</div>
+        <div class="pc-affil">Moffitt Cancer Center, Tampa, FL, USA</div>
+        <div class="pc-area">Radiotherapy AI · interpretability · uncertainty quantification</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Veronika Cheplygina</div>
+        <div class="pc-affil">IT University of Copenhagen, Denmark</div>
+        <div class="pc-area">Evaluation methodology · label-efficient learning</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Michael Riegler</div>
+        <div class="pc-affil">Simula Research Laboratory, Norway</div>
+        <div class="pc-area">Medical multimedia AI · AI safety and robustness</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Yu Tian</div>
+        <div class="pc-affil">University of Central Florida, USA</div>
+        <div class="pc-area">Interpretability · uncertainty quantification</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Jayashree Kalpathy-Cramer</div>
+        <div class="pc-affil">University of Colorado Anschutz Medical Campus, USA</div>
+        <div class="pc-area">Medical imaging AI · fairness · distribution shift</div>
+      </div>
     </div>
-    <div class="pc-card">
-      <div class="pc-name">Elena Sizikova</div>
-      <div class="pc-affil">U.S. Food and Drug Administration (FDA), USA</div>
-      <div class="pc-area">Regulatory science · robustness</div>
-    </div>
-    <div class="pc-card">
-      <div class="pc-name">Issam El Naqa</div>
-      <div class="pc-affil">Moffitt Cancer Center, Tampa, FL, USA</div>
-      <div class="pc-area">Radiotherapy AI · interpretability · uncertainty quantification</div>
-    </div>
-    <div class="pc-card">
-      <div class="pc-name">Veronika Cheplygina</div>
-      <div class="pc-affil">IT University of Copenhagen, Denmark</div>
-      <div class="pc-area">Evaluation methodology · label-efficient learning</div>
-    </div>
-    <div class="pc-card">
-      <div class="pc-name">Michael Riegler</div>
-      <div class="pc-affil">Simula Research Laboratory, Norway</div>
-      <div class="pc-area">Medical multimedia AI · AI safety and robustness</div>
-    </div>
-    <div class="pc-card">
-      <div class="pc-name">Yu Tian</div>
-      <div class="pc-affil">University of Central Florida, USA</div>
-      <div class="pc-area">Interpretability · uncertainty quantification</div>
-    </div>
-    <div class="pc-card">
-      <div class="pc-name">Jayashree Kalpathy-Cramer</div>
-      <div class="pc-affil">University of Colorado Anschutz Medical Campus, USA</div>
-      <div class="pc-area">Medical imaging AI · fairness · distribution shift</div>
-    </div>
-  </div>
-</section>
-
+  </section>
+ 
 </main>
-
+ 
 <!-- ── FOOTER ─────────────────────────────────────── -->
 <footer>
   <p>MedCompute 2026 &nbsp;·&nbsp; NeurIPS Workshop &nbsp;·&nbsp; Sydney, Australia &nbsp;·&nbsp; <a href="https://medical-ai.matters.today">medical-ai.matters.today</a></p>
 </footer>
-
+ 
 </body>
 </html>
