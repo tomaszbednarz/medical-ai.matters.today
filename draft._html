@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MedCompute 2026 — NeurIPS Workshop</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@400;500&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0f1923;
+    --paper: #f5f2eb;
+    --accent: #c0392b;
+    --accent2: #1a6b8a;
+    --muted: #6b7280;
+    --rule: #d1cbbf;
+    --card: #ffffff;
+    --tag-bg: #e8f4f8;
+    --tag-fg: #1a6b8a;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  /* ── HEADER ─────────────────────────────────────── */
+  header {
+    background: var(--ink);
+    color: var(--paper);
+    padding: 72px 0 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(255,255,255,.03) 60px, rgba(255,255,255,.03) 61px),
+      repeating-linear-gradient(0deg, transparent, transparent 60px, rgba(255,255,255,.03) 60px, rgba(255,255,255,.03) 61px);
+    pointer-events: none;
+  }
+
+  .header-inner {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px;
+    position: relative;
+  }
+
+  .workshop-badge {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: rgba(245,242,235,.55);
+    border: 1px solid rgba(245,242,235,.2);
+    padding: 4px 12px;
+    border-radius: 2px;
+    margin-bottom: 24px;
+  }
+
+  header h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 4vw, 44px);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 20px;
+    max-width: 720px;
+  }
+
+  header h1 em {
+    font-style: italic;
+    color: rgba(245,242,235,.75);
+  }
+
+  .header-tagline {
+    font-size: 15px;
+    color: rgba(245,242,235,.65);
+    max-width: 600px;
+    margin-bottom: 36px;
+    font-style: italic;
+  }
+
+  .organizer-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin-bottom: 40px;
+  }
+
+  .org-pill {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: rgba(245,242,235,.8);
+  }
+
+  .org-pill .org-name { font-weight: 500; }
+  .org-pill .org-affil { color: rgba(245,242,235,.45); font-size: 12px; }
+
+  nav {
+    display: flex;
+    gap: 4px;
+    flex-wrap: wrap;
+  }
+
+  nav a {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: rgba(245,242,235,.6);
+    text-decoration: none;
+    padding: 6px 14px;
+    border: 1px solid rgba(245,242,235,.15);
+    border-radius: 2px;
+    transition: all .2s;
+  }
+
+  nav a:hover {
+    color: var(--paper);
+    border-color: rgba(245,242,235,.4);
+    background: rgba(245,242,235,.08);
+  }
+
+  /* ── MAIN ────────────────────────────────────────── */
+  main {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 32px 80px;
+  }
+
+  section { padding: 56px 0 0; }
+  hr { border: none; border-top: 1px solid var(--rule); margin: 56px 0 0; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  h2 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(22px, 3vw, 30px);
+    font-weight: 400;
+    line-height: 1.25;
+    margin-bottom: 20px;
+    color: var(--ink);
+  }
+
+  h3 {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 28px 0 8px;
+    color: var(--ink);
+  }
+
+  p { margin-bottom: 16px; }
+  p:last-child { margin-bottom: 0; }
+
+  strong { font-weight: 500; }
+
+  /* ── OPEN PROBLEMS ───────────────────────────────── */
+  .problems-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+
+  .problem-card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 20px 22px;
+  }
+
+  .problem-num {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: .1em;
+    margin-bottom: 8px;
+  }
+
+  .problem-title {
+    font-weight: 500;
+    font-size: 15px;
+    margin-bottom: 8px;
+  }
+
+  .problem-body {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* ── DIFFERENTIATION ─────────────────────────────── */
+  .diff-grid {
+    display: grid;
+    gap: 16px;
+    margin-top: 16px;
+  }
+
+  .diff-item {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .diff-item:last-child { border-bottom: none; }
+
+  .diff-label {
+    font-weight: 500;
+    font-size: 15px;
+    padding-top: 2px;
+    color: var(--accent2);
+  }
+
+  .diff-body { font-size: 15px; }
+
+  /* ── TOPICS ──────────────────────────────────────── */
+  .topics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 12px;
+    margin-top: 20px;
+  }
+
+  .topic-item {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 18px;
+  }
+
+  .topic-title {
+    font-weight: 500;
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .topic-body {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.55;
+  }
+
+  .topics-note {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ── SCHEDULE ────────────────────────────────────── */
+  .schedule {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+
+  .schedule-row {
+    display: grid;
+    grid-template-columns: 130px 1fr;
+    border-bottom: 1px solid var(--rule);
+    transition: background .15s;
+  }
+
+  .schedule-row:last-child { border-bottom: none; }
+  .schedule-row:hover { background: #fafaf7; }
+  .schedule-row.keynote { background: #fdf6f5; }
+  .schedule-row.keynote:hover { background: #faecea; }
+  .schedule-row.discussion { background: #f0f7fa; }
+  .schedule-row.discussion:hover { background: #e6f2f7; }
+  .schedule-row.panel { background: #f5f0f8; }
+  .schedule-row.panel:hover { background: #ede5f3; }
+  .schedule-row.break { background: #fafaf7; }
+
+  .sched-time {
+    padding: 14px 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 12px;
+    color: var(--muted);
+    border-right: 1px solid var(--rule);
+    display: flex;
+    align-items: center;
+  }
+
+  .sched-session {
+    padding: 14px 20px;
+    font-size: 14.5px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .sched-session strong { font-weight: 500; }
+
+  .sched-tag {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-left: 10px;
+    vertical-align: middle;
+  }
+
+  .tag-keynote { background: #fdecea; color: var(--accent); }
+  .tag-invited { background: var(--tag-bg); color: var(--tag-fg); }
+  .tag-panel { background: #f0eaf7; color: #6b3fa0; }
+  .tag-contrib { background: #e8f5e9; color: #2e7d32; }
+
+  .sched-sub {
+    display: block;
+    width: 100%;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+
+  /* ── SPEAKERS ────────────────────────────────────── */
+  .speaker-list { display: flex; flex-direction: column; gap: 12px; }
+
+  .speaker-card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 18px 22px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .speaker-star {
+    font-size: 18px;
+    color: var(--accent);
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .speaker-info { flex: 1; }
+
+  .speaker-name {
+    font-weight: 500;
+    font-size: 16px;
+    margin-bottom: 3px;
+  }
+
+  .speaker-affil {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+
+  .speaker-area {
+    font-size: 13px;
+    color: var(--ink);
+  }
+
+  .speaker-slot {
+    display: inline-block;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    background: var(--tag-bg);
+    color: var(--tag-fg);
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-left: 8px;
+  }
+
+  /* ── DIVERSITY ───────────────────────────────────── */
+  .diversity-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .div-item {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 16px 18px;
+  }
+
+  .div-label {
+    font-weight: 500;
+    margin-bottom: 6px;
+    color: var(--accent2);
+    text-transform: uppercase;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: .06em;
+    font-size: 11px;
+  }
+
+  .div-body { font-size: 14px; line-height: 1.55; }
+
+  /* ── ORGANIZERS ──────────────────────────────────── */
+  .organizer-cards { display: flex; flex-direction: column; gap: 20px; margin-top: 16px; }
+
+  .org-card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 22px 26px;
+  }
+
+  .org-card-name {
+    font-family: 'DM Serif Display', serif;
+    font-size: 19px;
+    font-weight: 400;
+    margin-bottom: 2px;
+  }
+
+  .org-card-title {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 12px;
+    font-style: italic;
+  }
+
+  .org-card-bio {
+    font-size: 14.5px;
+    line-height: 1.7;
+  }
+
+  /* ── PROGRAM COMMITTEE ───────────────────────────── */
+  .pc-intro {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 20px;
+  }
+
+  .pc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 12px;
+  }
+
+  .pc-card {
+    background: var(--card);
+    border: 1px solid var(--rule);
+    border-radius: 4px;
+    padding: 14px 16px;
+  }
+
+  .pc-name { font-weight: 500; font-size: 15px; margin-bottom: 3px; }
+  .pc-affil { font-size: 12.5px; color: var(--muted); margin-bottom: 5px; }
+  .pc-area { font-size: 12px; color: var(--accent2); }
+
+  /* ── FOOTER ──────────────────────────────────────── */
+  footer {
+    background: var(--ink);
+    color: rgba(245,242,235,.5);
+    text-align: center;
+    padding: 28px 32px;
+    font-size: 13px;
+    font-family: 'DM Mono', monospace;
+    letter-spacing: .04em;
+  }
+
+  footer a { color: rgba(245,242,235,.7); text-decoration: none; }
+  footer a:hover { color: var(--paper); }
+
+  /* ── RESPONSIVE ──────────────────────────────────── */
+  @media (max-width: 640px) {
+    .diff-item { grid-template-columns: 1fr; gap: 6px; }
+    .schedule-row { grid-template-columns: 90px 1fr; }
+    .sched-time { font-size: 11px; padding: 12px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ── HEADER ─────────────────────────────────────── -->
+<header>
+  <div class="header-inner">
+    <div class="workshop-badge">NeurIPS 2026 Workshop · Sydney, Australia</div>
+    <h1>MedCompute 2026:<br><em>Compute-Accelerated Foundation Models for Medical Imaging</em></h1>
+    <p class="header-tagline">Compute meets clinic: GPU-accelerated reconstruction, foundation model pre-training, and robust deployment for real-world medical AI.</p>
+    <div class="organizer-list">
+      <div class="org-pill"><span class="org-name">Oge Marques</span><span class="org-affil">NVIDIA</span></div>
+      <div class="org-pill"><span class="org-name">Tomasz Bednarz</span><span class="org-affil">NVIDIA</span></div>
+      <div class="org-pill"><span class="org-name">Judy Wawira Gichoya</span><span class="org-affil">Emory University</span></div>
+      <div class="org-pill"><span class="org-name">Olivier Salvado</span><span class="org-affil">QUT</span></div>
+      <div class="org-pill"><span class="org-name">Soon Ki Jung</span><span class="org-affil">Kyungpook National University</span></div>
+    </div>
+    <nav>
+      <a href="#motivation">Motivation</a>
+      <a href="#topics">Topics</a>
+      <a href="#schedule">Schedule</a>
+      <a href="#speakers">Speakers</a>
+      <a href="#organizers">Organizers</a>
+      <a href="#committee">Program Committee</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+  <!-- MOTIVATION -->
+  <section id="motivation">
+    <p class="section-label">Topic &amp; Motivation</p>
+    <h2>Why This Workshop, Why Now</h2>
+    <p>An estimated 4.2 billion medical imaging studies are performed annually worldwide, yet despite the U.S. Food and Drug Administration clearing over 1,000 AI/ML-enabled medical devices, real-world clinical deployment remains a negligible fraction of global workflows. The compute infrastructure necessary to close that gap now exists: GPU-accelerated reconstruction pipelines, real-time edge inference, and scalable foundation model (FM) pretraining. What the community still lacks is scientific agreement on how to utilize this computational layer to build systems that are robust, verifiable, and safe at global clinical scale. MedCompute 2026 is where that systematic work begins.</p>
+    <p>Large-scale visual FMs demonstrate remarkable zero-shot transfer across diverse clinical modalities, with specialized architectures matching or exceeding specialist performance on structured diagnostic tasks. Yet generalized robustness remains fragile: a comprehensive 2025 benchmark (LMOD+) evaluating 24 state-of-the-art multimodal large language models found that frontier architectures achieved only ~57.8% accuracy on ophthalmic disease screening under zero-shot conditions, with performance collapsing toward random baselines on complex staging tasks. The vast majority of clinical AI tools remain trapped in the research phase, or fail post-deployment due to uncharacterized distribution shifts and calibration errors. The bottleneck is not data or architecture alone — it is the absence of <strong>compute-aware design principles</strong> that make FMs robust, efficient, and deployable across heterogeneous real-world clinical environments.</p>
+
+    <h3>Open Problems This Workshop Addresses</h3>
+    <p>MedCompute 2026 is organized around three open problems the community has not yet systematically solved:</p>
+    <div class="problems-grid">
+      <div class="problem-card">
+        <div class="problem-num">01</div>
+        <div class="problem-title">Compute-aware model design</div>
+        <div class="problem-body">How GPU memory constraints, reconstruction latency, and edge inference budgets should inform FM architecture and training.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">02</div>
+        <div class="problem-title">Closing the robustness gap</div>
+        <div class="problem-body">How to build evaluation frameworks that predict real-world clinical performance, not just benchmark accuracy, under distribution shift and scanner heterogeneity.</div>
+      </div>
+      <div class="problem-card">
+        <div class="problem-num">03</div>
+        <div class="problem-title">Verified clinical deployment</div>
+        <div class="problem-body">What a compute-to-clinic pipeline looks like when it must simultaneously satisfy regulatory, privacy, and equity constraints.</div>
+      </div>
+    </div>
+
+    <h3>Three Converging Factors in 2026</h3>
+    <p><strong>Edge compute platforms are achieving clinical readiness.</strong> 2025 marked a watershed moment for medical AI infrastructure, as high-performance edge platforms achieved regulatory clearance for real-time intraoperative use. Open-source, domain-specific frameworks now support multimodal inference directly at the point of care. The infrastructure is ready; the foundational algorithmic science must now catch up.</p>
+    <p><strong>The deployment and validation frontier severely lags.</strong> While <em>in silico</em> performance metrics advance rapidly, real-world robustness remains brittle. Recent analyses show that fewer than 30% of FDA-authorized radiology AI devices have undergone any clinical testing, with only 5% subject to rigorous prospective evaluation. Closing this trust deficit through verifiable, hardware-aware model design and federated evaluation is the workshop's core scientific mandate.</p>
+    <p><strong>The Sydney moment.</strong> NeurIPS 2026 places a flagship ML conference on Asia-Pacific soil for the first time. MedCompute 2026 is designed to bring Australia's world-class medical imaging institutions and AI-native companies into direct conversation with the global NeurIPS community.</p>
+
+    <h3>Differentiation from Related Workshops</h3>
+    <div class="diff-grid">
+      <div class="diff-item">
+        <div class="diff-label">Compute-first framing</div>
+        <div class="diff-body">Existing workshops treat compute as background infrastructure. MedCompute 2026 inverts this: compute-aware design — GPU-native reconstruction, hardware-software co-design, and real-time edge inference — is the primary scientific object of study. A paper on MRI acceleration that ignores reconstruction latency on clinical hardware would be out of scope here.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-label">Full pipeline scope</div>
+        <div class="diff-body">Recent series (e.g., AIM-FM at NeurIPS) focus on FM pretraining; the MICCAI ecosystem targets specific bottlenecks in isolation. MedCompute 2026 covers the full arc from GPU-accelerated reconstruction through FM pretraining to robustness under distribution shift and real-world deployment — treating each stage as an interconnected bottleneck in a single unified pipeline.</div>
+      </div>
+      <div class="diff-item">
+        <div class="diff-label">3D/volumetric native</div>
+        <div class="diff-body">CT, MRI, PET/CT, and ultrasound are fundamentally volumetric. The costs of volumetric attention can no longer be bypassed by 2D slicing, which destroys spatial context and introduces avoidable artifacts. Our program centers 3D ViTs, Mamba and State Space Models, and implicit neural representations as first-class topics.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- TOPICS -->
+  <section id="topics">
+    <p class="section-label">Scope</p>
+    <h2>Topics of Interest</h2>
+    <p>We invite submissions across the following interconnected themes. Full research contributions, position papers, negative results, dataset releases, and infrastructure papers are all explicitly encouraged.</p>
+    <div class="topics-grid">
+      <div class="topic-item">
+        <div class="topic-title">GPU-accelerated image reconstruction</div>
+        <div class="topic-body">Deep unrolling, learned priors, and diffusion-based methods for CT, MRI, PET/CT, and ultrasound; hardware-software co-design; acceleration benchmarks; handling of high-resolution data including whole-slide microscopy and digital breast tomosynthesis (DBT).</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Foundation model pre-training for medical imaging</div>
+        <div class="topic-body">Self-supervised and contrastive objectives; multimodal (image–report–genomic) pre-training; scaling laws specific to medical domains; open-source FM releases.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Multimodal AI and generative models</div>
+        <div class="topic-body">Vision–language models integrating imaging with radiology reports, EHRs, and genomics; clinical report generation; diffusion-based synthesis for augmentation, privacy, and rare pathology simulation; usage of synthetic data and digital twins for training, validation, and regulatory evaluation.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">3D and volumetric vision</div>
+        <div class="topic-body">Architectures native to volumetric data (3D ViTs, Mamba and State Space Models, implicit neural representations); efficient volumetric attention; anatomy- and topology-aware losses; cross-modality 3D alignment.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Evaluation, robustness, and interpretability</div>
+        <div class="topic-body">Distribution shift across scanners, sites, and populations; evaluation beyond aggregate AUC; dataset curation and bias auditing; prospective vs. retrospective validation; calibration under covariate shift; conformal prediction; concept-based explanations for imaging FMs; human–AI collaboration and trust.</div>
+      </div>
+      <div class="topic-item">
+        <div class="topic-title">Clinical deployment, regulatory pathways, and governance</div>
+        <div class="topic-body">Federated and privacy-preserving learning; edge inference on surgical and diagnostic devices; workflow integration and clinical validation; Green AI; regulatory pathways for AI/ML-based SaMD (FDA 510(k)/De Novo, CE Mark under the EU AI Act, TGA); post-market surveillance and continual learning.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- SCHEDULE -->
+  <section id="schedule">
+    <p class="section-label">Program</p>
+    <h2>Workshop Schedule</h2>
+    <p>A full-day in-person workshop structured around alternating focused talks and interactive discussion. The morning establishes the compute foundation; the afternoon translates it to the clinic.</p>
+    <div class="schedule">
+      <div class="schedule-row">
+        <div class="sched-time">09:00–09:15</div>
+        <div class="sched-session"><strong>Welcome and Framing</strong> — Organizers</div>
+      </div>
+      <div class="schedule-row keynote">
+        <div class="sched-time">09:15–10:00</div>
+        <div class="sched-session"><strong>Keynote</strong> — Aengus Tran, Harrison.ai, Australia <span class="sched-tag tag-keynote">Keynote</span></div>
+      </div>
+      <div class="schedule-row break">
+        <div class="sched-time">10:00–10:30</div>
+        <div class="sched-session" style="color:var(--muted);">Coffee Break &amp; Poster Session I</div>
+      </div>
+      <div class="schedule-row">
+        <div class="sched-time">10:30–11:05</div>
+        <div class="sched-session"><strong>Featured Talk: Compute Foundation</strong> — Sajid Javed, Khalifa University <span class="sched-tag tag-invited">Featured</span><span class="sched-sub">GPU-accelerated reconstruction and FM pre-training</span></div>
+      </div>
+      <div class="schedule-row discussion">
+        <div class="sched-time">11:05–11:45</div>
+        <div class="sched-session"><strong>Open Discussion</strong> — <em>Building on the Compute Foundation</em></div>
+      </div>
+      <div class="schedule-row break">
+        <div class="sched-time">11:45–13:15</div>
+        <div class="sched-session" style="color:var(--muted);">Lunch Break</div>
+      </div>
+      <div class="schedule-row">
+        <div class="sched-time">13:15–14:15</div>
+        <div class="sched-session"><strong>Contributed Papers: Spotlight Talks</strong> (6 × 10 min) <span class="sched-tag tag-contrib">Contributed</span></div>
+      </div>
+      <div class="schedule-row break">
+        <div class="sched-time">14:15–15:00</div>
+        <div class="sched-session" style="color:var(--muted);">Coffee Break &amp; Poster Session II</div>
+      </div>
+      <div class="schedule-row">
+        <div class="sched-time">15:00–15:35</div>
+        <div class="sched-session"><strong>Featured Talk: Clinical Translation</strong> — Hyungjeong Yang, Chonnam National University <span class="sched-tag tag-invited">Featured</span><span class="sched-sub">Robustness, deployment, and regulatory pathways</span></div>
+      </div>
+      <div class="schedule-row panel">
+        <div class="sched-time">15:35–16:45</div>
+        <div class="sched-session"><strong>Panel Discussion</strong> — <em>From Compute to Clinic: What Will It Actually Take?</em> <span class="sched-tag tag-panel">Panel</span></div>
+      </div>
+      <div class="schedule-row">
+        <div class="sched-time">16:45–17:00</div>
+        <div class="sched-session"><strong>Best Paper Award and Closing Remarks</strong></div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- SPEAKERS -->
+  <section id="speakers">
+    <p class="section-label">Invited Speakers</p>
+    <h2>Speaker Lineup</h2>
+    <div class="speaker-list">
+      <div class="speaker-card">
+        <div class="speaker-star">★</div>
+        <div class="speaker-info">
+          <div class="speaker-name">Aengus Tran <span class="speaker-slot">AU/APAC Keynote · Confirmed</span></div>
+          <div class="speaker-affil">Harrison.ai, Australia</div>
+          <div class="speaker-area">Large-scale clinical AI deployment · AI-assisted radiology · scaling medical AI products</div>
+        </div>
+      </div>
+      <div class="speaker-card">
+        <div class="speaker-star">★</div>
+        <div class="speaker-info">
+          <div class="speaker-name">Sajid Javed <span class="speaker-slot">Morning Session · Confirmed</span></div>
+          <div class="speaker-affil">Khalifa University of Science and Technology, UAE</div>
+          <div class="speaker-area">Computational pathology · histopathological image analysis</div>
+        </div>
+      </div>
+      <div class="speaker-card">
+        <div class="speaker-star">★</div>
+        <div class="speaker-info">
+          <div class="speaker-name">Hyungjeong Yang <span class="speaker-slot">Afternoon Session · Confirmed</span></div>
+          <div class="speaker-affil">Chonnam National University, South Korea</div>
+          <div class="speaker-area">Medical AI · multimodal healthcare intelligence · clinical AI translation · trustworthy AI</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- DIVERSITY -->
+  <section id="diversity">
+    <p class="section-label">Diversity &amp; Inclusion</p>
+    <h2>Our Commitment</h2>
+    <p>Diversity is a design constraint of this workshop, not an afterthought.</p>
+    <div class="diversity-grid">
+    <div class="div-item">
+      <div class="div-label">Organizers</div>
+      <div class="div-body">The team spans three countries.</div>
+    </div>
+      <div class="div-item">
+        <div class="div-label">Speakers &amp; PC</div>
+        <div class="div-body">Selected for gender, geographic, and career-stage diversity: ≥40% female speakers; PC from ≥10 countries with ≥35% female members; panel to include at least one clinician from the Global South.</div>
+      </div>
+      <div class="div-item">
+        <div class="div-label">Submissions</div>
+        <div class="div-body">Registration fees waived for accepted authors from low- and middle-income countries, with ≥2 spotlight slots reserved for early-career researchers.</div>
+      </div>
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- ORGANIZERS -->
+  <section id="organizers">
+    <p class="section-label">Organizing Team</p>
+    <h2>Organizers</h2>
+    <div class="organizer-cards">
+
+      <div class="org-card">
+        <div class="org-card-name">Oge Marques</div>
+        <div class="org-card-title">NVAITC Senior Scientist, NVIDIA AI Technology Centre; Emeritus Professor of Engineering and Computer Science, Florida Atlantic University</div>
+        <div class="org-card-bio">Oge Marques works at the interface of academic research and NVIDIA's AI stack, focusing on medical imaging and foundation models. He is Emeritus Professor of Engineering and Computer Science at Florida Atlantic University, where he taught and led research in visual AI and medical image analysis for over two decades, supervising 10 PhD and 17 Master's students to completion. His editorial service includes membership on the Editorial Board of <em>Multimedia Tools and Applications</em> (Springer, 2012–2024), and he serves as Book Series Editor for <em>Applied Machine Learning</em> (Springer, 2021–present). His professional service includes his current role as Chair of the Recognition and Awards Committee of the IEEE Palm Beach Section, Senior Membership in both IEEE and ACM, and active membership in medical imaging societies including SIIM, RSNA, EuSoMII, ESR, and AMIA. He is a Leshner Leadership Institute Public Engagement Fellow of the American Association for the Advancement of Science (AAAS). MedCompute 2026 is his first NeurIPS workshop proposal. His involvement brings direct access to NVIDIA's medical AI compute stack — including MONAI, Holoscan, Clara, and BioNeMo — as well as a long-standing research network spanning four continents.</div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-card-name">Tomasz Bednarz</div>
+        <div class="org-card-title">Director of Strategic Research Collaboration, NVIDIA AI Technology Centre; Visiting Scientist at CSIRO; Adjunct Professor at University of Queensland</div>
+        <div class="org-card-bio">Tomasz Bednarz is the Director of Strategic Research Collaboration and Special Projects at NVIDIA AI Technology Centre. In this capacity, he leads a team focused on engaging with leading researchers and premier research institutions, driving the adoption of cutting-edge NVIDIA software technologies in innovative, computationally intensive projects designed to tackle some of the world's most complex scientific challenges. His research background spans computational science, physics, computational imaging and visualization, and HPC; he brings to MedCompute 2026 direct access to NVIDIA's medical AI compute stack — including MONAI, Holoscan, Clara, and BioNeMo — as well as deep ties to the Australian research computing ecosystem through CSIRO and national infrastructure partners including NIF and Pawsey. He has co-organized workshops and symposia at ACM and IEEE conferences, eResearch Australasia, Web3D, and has over 20 years of experience bridging academic research and industrial deployment of AI systems.</div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-card-name">Judy Wawira Gichoya</div>
+        <div class="org-card-title">Associate Professor, Department of Radiology and Imaging Sciences, Emory University School of Medicine</div>
+        <div class="org-card-bio">Judy Wawira Gichoya is an Associate Professor of Radiology and Imaging Sciences at Emory University School of Medicine, where her research focuses on algorithmic fairness, hidden bias in medical imaging AI, and equitable clinical deployment across diverse populations. Trained as both an informatician and an interventional radiologist, she co-leads the Healthcare AI Innovation and Translational Informatics (HITI) Lab at Emory, which builds diverse imaging datasets, validates AI models in real-world settings, and develops multimodal fusion models combining imaging and clinical text. She is internationally recognized for her landmark study demonstrating that AI models silently encode patient race across multiple imaging modalities — published in <em>The Lancet Digital Health</em> — a finding with broad implications for bias auditing and patient safety in deployed clinical AI. She serves on the editorial boards of <em>NEJM AI</em> and <em>Radiology: Artificial Intelligence</em>, and is an NIH DATA Scholar supporting the DSI-Africa program for building data science capacity across the African continent. Her involvement in MedCompute 2026 brings a critical perspective on the equitable deployment of AI across diverse clinical populations, particularly in low- and middle-income settings.</div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-card-name">Olivier Salvado</div>
+        <div class="org-card-title">Professor of AI, co-director of the QUT AI in Health Research Network, Faculty of Engineering, Queensland University of Technology</div>
+        <div class="org-card-bio">Olivier Salvado is a Professor of AI at Queensland University of Technology, where he leads research to translate advanced machine learning to clinical applications. He is the co-director of the AI in Health research network at QUT to bridge engineering with health. He has been an investigator in one of the largest Australian studies on Alzheimer's biomarkers since 2007 and contributed to several key neuroimaging analysis methods. Professor Salvado was formerly the head of imaging and computer vision at the CSIRO, led large AI initiatives across the organisation, and contributed to numerous large-scale Australian studies and technology development. He was involved in several international conference organisations including as general co-chair of ISBI in 2017, program co-chair of ISBI in 2023, and will contribute to organising MICCAI 2028. His expertise in medical image analysis and computer vision for medical applications is brought to MedCompute 2026, leveraging his network within the Asia-Pacific clinical AI ecosystem that the workshop is designed to engage.</div>
+      </div>
+
+      <div class="org-card">
+        <div class="org-card-name">Soon Ki Jung</div>
+        <div class="org-card-title">Professor, School of Computer Science and Engineering, Kyungpook National University</div>
+        <div class="org-card-bio">Soon Ki Jung is a Professor in the School of Computer Science and Engineering at Kyungpook National University, South Korea, where he leads the Visual AI Lab research group. His recent research focuses on human behavior analysis, facial privacy and privacy-preserving facial image analysis, medical image segmentation, and multimodal foundation models for medical image analysis, including 3D CT-based body composition analysis. He has published more than 290 peer-reviewed papers and has served on the program committees of ACM RACS, CGI, RSL-CV, FCV, and IVCNZ. He has co-organized major international research events, including serving as the General Chair of IEEE VR 2026, the Conference Chair of SIGGRAPH Asia 2022, and the General Chair of the 27th International Workshop on Frontiers of Computer Vision. His role in MedCompute 2026 strengthens the Asia-Pacific representation of the workshop and its connections to the communities of computer vision, medical image segmentation, and multimodal medical foundation models.</div>
+      </div>
+
+    </div>
+  </section>
+
+  <hr>
+
+  <!-- PROGRAM COMMITTEE -->
+  <section id="committee">
+    <p class="section-label">Program Committee</p>
+    <h2>Confirmed Members</h2>
+    <p class="pc-intro">We are targeting a final PC of 25–30 members with representation from at least 10 countries and ≥35% female members.</p>
+    <div class="pc-grid">
+      <div class="pc-card">
+        <div class="pc-name">Ge Wang</div>
+        <div class="pc-affil">Rensselaer Polytechnic Institute, USA</div>
+        <div class="pc-area">CT/MRI reconstruction · imaging AI</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Alexandre Falcão</div>
+        <div class="pc-affil">University of Campinas (UNICAMP), Brazil</div>
+        <div class="pc-area">Image processing · pattern recognition</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Felipe Kitamura</div>
+        <div class="pc-affil">Eden, USA / UNIFESP, Brazil</div>
+        <div class="pc-area">Radiology AI · clinical deployment</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Leticia Rittner</div>
+        <div class="pc-affil">University of Campinas (UNICAMP), Brazil</div>
+        <div class="pc-area">Brain MRI analysis · white matter segmentation · diffusion MRI</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Peter van Ooijen</div>
+        <div class="pc-affil">UMCG, Netherlands</div>
+        <div class="pc-area">AI in radiotherapy · medical imaging informatics</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Elena Sizikova</div>
+        <div class="pc-affil">FDA, USA</div>
+        <div class="pc-area">Regulatory science · robustness</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Issam El Naqa</div>
+        <div class="pc-affil">Moffitt Cancer Center, USA</div>
+        <div class="pc-area">Radiotherapy AI · interpretability</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Veronika Cheplygina</div>
+        <div class="pc-affil">IT University of Copenhagen, Denmark</div>
+        <div class="pc-area">Evaluation methodology · label-efficient learning</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Michael Riegler</div>
+        <div class="pc-affil">Simula Research Laboratory, Norway</div>
+        <div class="pc-area">Medical multimedia AI · AI safety and robustness</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Yu Tian</div>
+        <div class="pc-affil">University of Central Florida, USA</div>
+        <div class="pc-area">Interpretability · uncertainty quantification</div>
+      </div>
+      <div class="pc-card">
+        <div class="pc-name">Jayashree Kalpathy-Cramer</div>
+        <div class="pc-affil">University of Colorado Anschutz, USA</div>
+        <div class="pc-area">Medical imaging AI · fairness</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<!-- ── FOOTER ─────────────────────────────────────── -->
+<footer>
+  <p>MedCompute 2026 &nbsp;·&nbsp; NeurIPS Workshop &nbsp;·&nbsp; Sydney, Australia &nbsp;·&nbsp; <a href="https://medical-ai.matters.today">medical-ai.matters.today</a></p>
+</footer>
+
+</body>
+</html>
