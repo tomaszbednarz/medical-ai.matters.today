@@ -1,0 +1,321 @@
+<meta charset="utf-8">
+<title>Matching researchers with NV hosts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=Hanken+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: briefing header → host tables (click to filter) → researcher cards grid */
+:root{
+  --bg:#f6f7f3; --surface:#ffffff; --ink:#1b2219; --muted:#5d6a58; --line:#dfe4d9;
+  --accent:#4f7a12; --accent-soft:#e9f1db; --warn:#8a5a00; --warn-soft:#fbf1dc;
+  --display:"Bricolage Grotesque",ui-sans-serif,system-ui,sans-serif;
+  --body:"Hanken Grotesk",ui-sans-serif,system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,monospace;
+  --avL:88%; --avC:32%;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121611;--surface:#1a2018;--ink:#e6ebe1;--muted:#9aa693;--line:#2c3529;--accent:#9fd04a;--accent-soft:#25331a;--warn:#f0c46a;--warn-soft:#332a14;--avL:32%;--avC:80%;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#121611;--surface:#1a2018;--ink:#e6ebe1;--muted:#9aa693;--line:#2c3529;--accent:#9fd04a;--accent-soft:#25331a;--warn:#f0c46a;--warn-soft:#332a14;--avL:32%;--avC:80%;color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5}
+.wrap{max-width:1240px;margin:0 auto;padding-inline:clamp(16px,4vw,40px);padding-block:32px 64px;display:flex;flex-direction:column;gap:36px}
+.top{display:flex;flex-direction:column;gap:10px;border-bottom:1px solid var(--line);padding-bottom:24px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent)}
+h1{font-family:var(--display);font-weight:700;font-size:clamp(28px,4.4vw,44px);line-height:1.05;margin:0;text-wrap:balance}
+.lede{color:var(--muted);max-width:68ch;margin:0}
+.stats{display:flex;flex-wrap:wrap;gap:8px 24px;font-family:var(--mono);font-size:13px;color:var(--muted)}
+.stats b{color:var(--ink);font-weight:500}
+h2{font-family:var(--display);font-weight:500;font-size:22px;margin:0}
+.sec{display:flex;flex-direction:column;gap:14px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px}
+.hint{font-size:13px;color:var(--muted)}
+#reset{font:inherit;font-size:13px;background:none;border:1px solid var(--line);color:var(--ink);border-radius:999px;padding:4px 12px;cursor:pointer}
+#reset[hidden]{display:none!important}
+.tables{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+.tbl{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:14px 16px;background:var(--surface);border:1px solid var(--line);border-top:4px solid hsl(var(--h) 45% 45%);border-radius:6px;min-width:0}
+.tbl:hover{border-color:hsl(var(--h) 45% 45%)}
+.tbl:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tbl[aria-pressed="true"]{background:var(--accent-soft);border-color:var(--accent)}
+.hn{font-weight:600;font-size:16px}
+.hr{font-size:13px;color:var(--ink)}
+.hx{font-size:12px;color:var(--muted)}
+.tbl ul{margin:8px 0 0;padding-left:20px;font-size:14px;display:flex;flex-direction:column;gap:2px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.card header{display:flex;gap:12px;align-items:flex-start}
+.av{flex:none;width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:18px;background:hsl(var(--h) 40% var(--avL));color:hsl(var(--h) 50% var(--avC))}
+.who{min-width:0}
+.who h3{margin:0;font-size:17px;font-weight:600;line-height:1.25}
+.aff{margin:2px 0 0;font-size:13px;color:var(--muted)}
+.kw{list-style:none;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:6px}
+.kw li{font-family:var(--mono);font-size:11.5px;padding:2px 8px;border-radius:4px;background:var(--accent-soft);color:var(--ink)}
+.hook{margin:0;font-size:14px}
+.match{border-top:1px dashed var(--line);padding-top:10px;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px}
+.match .lbl{font-family:var(--mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--accent)}
+.match strong{font-size:15px}
+.match .bk{font-size:12px;color:var(--muted)}
+.match p{flex-basis:100%;margin:2px 0 0;font-size:13px;color:var(--muted)}
+.flag{margin:0;font-size:12.5px;color:var(--warn);background:var(--warn-soft);padding:4px 8px;border-radius:4px}
+.card footer{margin-top:auto;font-size:13px}
+.card footer a{color:var(--accent);text-decoration:none}
+.card footer a:hover{text-decoration:underline}
+.muted{color:var(--muted)}
+.notes{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px;max-width:80ch}
+.notes p{margin:0 0 6px}
+@media (max-width:420px){.cards{grid-template-columns:1fr}.tables{grid-template-columns:1fr}}
+</style>
+<div class="wrap">
+<section class="top">
+<span class="eyebrow">GTC Berlin 2026 · Breakfast with Top Researchers</span>
+<h1>Matching researchers with NV hosts</h1>
+<p class="lede">Confirmed (green) researchers with their current role, research focus and an opening topic, each paired with the NVIDIA host whose background fits best, plus a backup.</p>
+<div class="stats"><span><b>35</b> researchers</span><span><b>9</b> NVIDIA hosts</span><span>~4 researchers per host</span></div>
+</section>
+<section class="sec">
+<div class="sec-head"><h2>Hosts and their researchers</h2><span class="hint">Click a host to filter the cards below. <button id="reset" hidden>Show all</button></span></div>
+<div class="tables">
+<button class="tbl" data-host="JS" style="--h:0" aria-pressed="false"><span class="hn">Judit Szulágyi</span><span class="hr">Host · former ETH Zurich Professor of Computational Astrophysics</span><span class="hx">Computational astrophysics, radiation-hydro simulations, HPC</span><ul><li>Charlotte Debus</li><li>Maarit Korpi-Lagg</li><li>Noah Clarke Hall</li><li>Sadiq Jaffer</li></ul></button>
+<button class="tbl" data-host="TB" style="--h:40" aria-pressed="false"><span class="hn">Tomasz Bednarz</span><span class="hr">Director, Strategic Researcher Engagement</span><span class="hx">Scientific visualisation, simulation, graphics/XR, GenAI for science</span><ul><li>Alessandra Russo</li><li>Björn Ommer</li><li>François Letierce</li><li>Travis Waller</li></ul></button>
+<button class="tbl" data-host="MS" style="--h:80" aria-pressed="false"><span class="hn">Max Starubinskiy</span><span class="hr">Campaign Marketing Lead, Higher Ed &amp; Research</span><span class="hx">DLI Teaching Kits, University Ambassadors, student programs</span><ul><li>Magdalena Mazur-Milecka</li><li>Mustafa Youldash</li><li>Shival Indermun</li></ul></button>
+<button class="tbl" data-host="KP" style="--h:120" aria-pressed="false"><span class="hn">Kimberly Powell</span><span class="hr">VP, Healthcare</span><span class="hx">Healthcare AI, medical imaging, Clara/MONAI, digital biology</span><ul><li>Akos Dobay</li><li>Aldo Faisal</li><li>Sophia Ananiadou</li><li>Stefano Moriconi</li></ul></button>
+<button class="tbl" data-host="VS" style="--h:160" aria-pressed="false"><span class="hn">Vartika Singh</span><span class="hr">Strategic AI Lead</span><span class="hx">DL frameworks &amp; compilers partnerships, distributed AI, Triton inference</span><ul><li>André Martins</li><li>Marcos Treviso</li><li>Mehdi Ali</li><li>Michael Fromm</li></ul></button>
+<button class="tbl" data-host="KD" style="--h:200" aria-pressed="false"><span class="hn">Kieran Didi</span><span class="hr">Research Scientist, NVIDIA Research (GenAIR)</span><span class="hx">Generative protein design (Proteina), flow matching, BioNeMo</span><ul><li>Grzegorz Popowicz</li><li>Noelia Ferruz</li><li>Peter Coveney</li></ul></button>
+<button class="tbl" data-host="AG" style="--h:240" aria-pressed="false"><span class="hn">Andy Grant</span><span class="hr">Sales, UK · EMEA Director, Supercomputing, Higher Ed &amp; AI</span><span class="hx">UK &amp; EuroHPC supercomputing, institution-level AI deployments</span><ul><li>Cristian Canton Ferrer</li><li>David Barber</li><li>Filipe Ferreira</li><li>Geraint Rees</li><li>Mateo Valero</li></ul></button>
+<button class="tbl" data-host="AM" style="--h:280" aria-pressed="false"><span class="hn">Amit Goel</span><span class="hr">Director, Robotics Product Mgmt &amp; Ecosystem</span><span class="hx">Jetson, Isaac Sim/Lab, ROS, robotics ecosystem (ex-Synopsys)</span><ul><li>Cheng Deng</li><li>Hussam Amrouch</li><li>Kostas Alexis</li><li>Vijay Janapa Reddi</li></ul></button>
+<button class="tbl" data-host="CP" style="--h:320" aria-pressed="false"><span class="hn">Chris Paulson</span><span class="hr">Robotics</span><span class="hx">Robotics (background not publicly verifiable)</span><ul><li>Andrew Davison</li><li>Cesar Cadena</li><li>Matthieu Cord</li><li>Vishnuu Jothi Prakash</li></ul></button>
+</div>
+</section>
+<section class="sec">
+<div class="sec-head"><h2>Researcher briefings</h2><span class="hint" id="count"></span></div>
+<div class="cards">
+<article class="card" data-host="JS" style="--h:0">
+<header><div class="av" aria-hidden="true">CD</div><div class="who"><h3>Charlotte Debus</h3><p class="aff">Junior Group Leader, Robust &amp; Efficient AI, KIT Scientific Computing Center</p></div></header>
+<ul class="kw"><li>Energy-efficient AI</li><li>scalable ML on HPC</li><li>uncertainty quantification</li></ul>
+<p class="hook">Co-author of perun energy benchmarking and Nature MI paper on reporting AI electricity use.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Judit Szulágyi</strong><span class="bk">backup: Andy Grant</span><p>Physicist doing AI on supercomputers; GPU energy efficiency.</p></div>
+<footer><a href="https://www.helmholtz.de/assets/helmholtz_gemeinschaft/_processed_/0/c/csm_charlotte_debus_c_privat_7a4c326b3e.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.helmholtz.de/en/ai-experts/charlotte-debus/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="JS" style="--h:0">
+<header><div class="av" aria-hidden="true">ML</div><div class="who"><h3>Maarit Korpi-Lagg</h3><p class="aff">Associate Professor, Aalto University; leads Aalto HPC Lab</p></div></header>
+<ul class="kw"><li>Astrophysical MHD</li><li>solar dynamo</li><li>GPU stencil codes</li></ul>
+<p class="hook">Her lab develops Astaroth (CUDA MHD code, also on AMD/LUMI); new AI+simulation hybrid models of solar magnetism.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Judit Szulágyi</strong><span class="bk">backup: Andy Grant</span><p>Astrophysics + GPU simulation is exactly your background; PhysicsNeMo hook.</p></div>
+<footer><a href="https://acris.aalto.fi/ws/portalfiles/portal/52488235/MJK_kuva.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.aalto.fi/en/people/maarit-korpi-lagg" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="JS" style="--h:0">
+<header><div class="av" aria-hidden="true">NH</div><div class="who"><h3>Noah Clarke Hall</h3><p class="aff">CERN Fellow (NextGen Triggers); PhD UCL/ATLAS</p></div></header>
+<ul class="kw"><li>Real-time ML triggers</li><li>LHC anomaly detection</li><li>low-latency inference</li></ul>
+<p class="hook">Panel speaker; works with NVIDIA DAQIRI team via CERN openlab A-GHOST.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Judit Szulágyi</strong><span class="bk">backup: Vartika Singh</span><p>Physicist-to-physicist; Vartika wrote NVIDIA&#x27;s Triton-for-Fermilab HEP inference work.</p></div>
+<p class="flag">Email in list is low-confidence (old UCL address).</p><footer><a href="https://www.ucl.ac.uk/mathematical-physical-sciences/sites/mathematical_physical_sciences/files/styles/wysiwyg_mobile/public/2025-12/Clarke_Hall_Noah_2022_1250x1750_p.jpg.jpg?itok=ITniJfuQ" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.ucl.ac.uk/mathematical-physical-sciences/noah-clarke-hall-phd-student" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="JS" style="--h:0">
+<header><div class="av" aria-hidden="true">SJ</div><div class="who"><h3>Sadiq Jaffer</h3><p class="aff">Assistant Research Professor, Univ. of Cambridge (Computer Science)</p></div></header>
+<ul class="kw"><li>Earth-observation foundation models</li><li>AI for climate &amp; conservation</li></ul>
+<p class="hook">Co-lead of TESSERA, a global 10 m Earth-observation foundation model; ex-Head of Tech, Cambridge Centre for Carbon Credits.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Judit Szulágyi</strong><span class="bk">backup: Tomasz Bednarz</span><p>Planetary-scale science modelling; Earth-2 and geospatial AI on NVIDIA GPUs (TESSERA was showcased on AMD).</p></div>
+<footer><a href="https://www.cst.cam.ac.uk/sites/default/files/images/profile/sadiq-cropped.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.cst.cam.ac.uk/people/sj514" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="TB" style="--h:40">
+<header><div class="av" aria-hidden="true">AR</div><div class="who"><h3>Alessandra Russo</h3><p class="aff">Professor &amp; Head of Dept. of Computing, Imperial College London</p></div></header>
+<ul class="kw"><li>Neuro-symbolic AI</li><li>symbolic ML (ILASP)</li><li>safe &amp; trusted AI</li></ul>
+<p class="hook">Co-directs the UKRI CDT in Safe &amp; Trusted AI and the Thomson Reuters–Imperial Frontier AI lab.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Tomasz Bednarz</strong><span class="bk">backup: Max Starubinskiy</span><p>As Head of Department, a strategic engagement contact; Max for teaching/CDT programs.</p></div>
+<footer><a href="https://profiles.imperial.ac.uk/a.russo/thumbnail" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://profiles.imperial.ac.uk/a.russo" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="TB" style="--h:40">
+<header><div class="av" aria-hidden="true">BO</div><div class="who"><h3>Björn Ommer</h3><p class="aff">Professor, LMU Munich (CompVis); LMU Chief AI Officer</p></div></header>
+<ul class="kw"><li>Generative AI</li><li>latent diffusion / flow matching</li><li>visual synthesis</li></ul>
+<p class="hook">His group created Stable Diffusion; coordinates the Bavarian AI Foundation Model Initiative.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Tomasz Bednarz</strong><span class="bk">backup: Andy Grant</span><p>Strategic researcher relationship plus graphics/GenAI background; Andy for Bavarian compute.</p></div>
+<footer><a href="https://ommer-lab.com/wp-content/uploads/2021/09/Bjorn.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://ommer-lab.com/ommer/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="TB" style="--h:40">
+<header><div class="av" aria-hidden="true">FL</div><div class="who"><h3>François Letierce</h3><p class="aff">Research Engineer, CEA LiHPC (France)</p></div></header>
+<ul class="kw"><li>HPC programming models</li><li>GPU porting</li><li>ISO C++</li></ul>
+<p class="hook">Ports CEA simulation codes to GPUs (Arcane, NabLab); joins hardware co-design meetings with NVIDIA.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Tomasz Bednarz</strong><span class="bk">backup: Andy Grant</span><p>Porting simulation codes to GPUs fits Tomasz&#x27;s computational-physics background; Andy for the CEA account.</p></div>
+<p class="flag">Research engineer, not PI.</p><footer><a href="https://www-lihpc.cea.fr/images/team/letierce.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www-lihpc.cea.fr/en/team/permanents/letierce.html" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="TB" style="--h:40">
+<header><div class="av" aria-hidden="true">TW</div><div class="who"><h3>Travis Waller</h3><p class="aff">Lighthouse Professor, Transport Modelling &amp; Simulation, TU Dresden</p></div></header>
+<ul class="kw"><li>Transport network modelling</li><li>large-scale simulation</li><li>mobility digital twins</li></ul>
+<p class="hook">Founder of UNSW rCITI; large-scale traffic equilibrium and simulation models.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Tomasz Bednarz</strong><span class="bk">backup: Chris Paulson</span><p>Simulation + visualisation; Omniverse city/mobility digital twins.</p></div>
+<p class="flag">Approved poster presenter, not yet in RSVP export.</p><footer><a href="https://tu-dresden.de/bu/verkehr/ivs/tms/ressourcen/bilder/staff/Travis_Waller_portrait.jpg/@@images/669959c3-ee4c-45f3-ba4f-5fac1d76cc49.jpeg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://tu-dresden.de/bu/verkehr/ivs/tms/die-professur/inhaber-in" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="MS" style="--h:80">
+<header><div class="av" aria-hidden="true">MM</div><div class="who"><h3>Magdalena Mazur-Milecka</h3><p class="aff">Assistant Professor, Biomedical Engineering, Gdańsk Univ. of Technology</p></div></header>
+<ul class="kw"><li>Thermal imaging</li><li>biomedical computer vision</li><li>deep segmentation</li></ul>
+<p class="hook">Deep learning on thermal video: rodent behaviour tracking, contactless vital signs.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Max Starubinskiy</strong><span class="bk">backup: Kimberly Powell</span><p>Early-career faculty: academic programs, teaching kits, grants; Kimberly for imaging.</p></div>
+<p class="flag">No public photo retrievable.</p><footer><a href="https://pg.edu.pl/en/p/magdalena-mazur-milecka-491161" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="MS" style="--h:80">
+<header><div class="av" aria-hidden="true">MY</div><div class="who"><h3>Mustafa Youldash</h3><p class="aff">Assistant Professor of CS, Imam Abdulrahman Bin Faisal University (KSA)</p></div></header>
+<ul class="kw"><li>AI in healthcare</li><li>deep RL</li><li>NLP</li></ul>
+<p class="hook">Already an NVIDIA DLI Certified Instructor and University Ambassador.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Max Starubinskiy</strong><span class="bk">backup: Kimberly Powell</span><p>Existing DLI ambassador; Max owns that program.</p></div>
+<p class="flag">Photo is his GitHub avatar.</p><footer><a href="https://avatars.githubusercontent.com/u/1390479?v=4" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://github.com/youldash" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="MS" style="--h:80">
+<header><div class="av" aria-hidden="true">SI</div><div class="who"><h3>Shival Indermun</h3><p class="aff">Lecturer in Applied Data Science &amp; AI, Breda Univ. of Applied Sciences</p></div></header>
+<ul class="kw"><li>Human-aware robot navigation</li><li>computer vision</li><li>visual SLAM</li></ul>
+<p class="hook">PhD 2025 on human-aware navigation; BUas runs a 26-GPU NVIDIA student cluster.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Max Starubinskiy</strong><span class="bk">backup: Amit Goel</span><p>Teaching-focused: DLI Teaching Kits, Jetson/Isaac for courses.</p></div>
+<footer><a href="https://ai.buas.nl/assets/images/faculty/shival.png" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://ai.buas.nl/faculty/shival-indermun.html" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="KP" style="--h:120">
+<header><div class="av" aria-hidden="true">AD</div><div class="who"><h3>Akos Dobay</h3><p class="aff">PD Dr., Co-Director, Forensic ML Technology Center, Univ. of Zurich</p></div></header>
+<ul class="kw"><li>Forensic imaging</li><li>postmortem CT</li><li>deep learning</li></ul>
+<p class="hook">Physicist applying deep learning to Virtopsy postmortem CT.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Kimberly Powell</strong><span class="bk">backup: Kieran Didi</span><p>Medical imaging AI (MONAI, Clara).</p></div>
+<p class="flag">No public photo found.</p><footer><a href="https://virtopsy.com/2020/02/06/akos-dobay/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="KP" style="--h:120">
+<header><div class="av" aria-hidden="true">AF</div><div class="who"><h3>Aldo Faisal</h3><p class="aff">Professor of AI &amp; Neuroscience, Imperial College London; Chair of Digital Health, Univ. of Bayreuth</p></div></header>
+<ul class="kw"><li>AI for healthcare</li><li>neurotechnology &amp; robotics</li><li>digital biomarkers</li><li>health foundation models</li></ul>
+<p class="hook">Created the &#x27;AI Clinician&#x27; for sepsis (Nature Medicine); directs the UKRI CDT in AI for Healthcare; leads Nightingale AI, a health foundation model effort; German Ethics Council member.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Kimberly Powell</strong><span class="bk">backup: Amit Goel</span><p>Health foundation models and clinical AI are core Kimberly territory; Amit for his neurorobotics work.</p></div>
+<p class="flag">New on the list this week.</p><footer><a href="https://www.ethikrat.org/fileadmin/_processed_/d/9/csm_faisal_1f3b5a48c2.png" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.ethikrat.org/en/about-us/members/aldo-faisal/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="KP" style="--h:120">
+<header><div class="av" aria-hidden="true">SA</div><div class="who"><h3>Sophia Ananiadou</h3><p class="aff">Professor &amp; Director, National Centre for Text Mining, Univ. of Manchester</p></div></header>
+<ul class="kw"><li>Biomedical NLP</li><li>clinical &amp; mental-health LLMs</li><li>LLM interpretability</li></ul>
+<p class="hook">Runs NaCTeM (tools used by NICE/Cochrane for systematic reviews); now LLM reasoning &amp; interpretability for clinical text.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Kimberly Powell</strong><span class="bk">backup: Vartika Singh</span><p>Clinical/biomedical text is a healthcare-AI conversation; LLM side is Vartika&#x27;s.</p></div>
+<footer><a href="https://research.manchester.ac.uk/files-asset/75966899/SA.jpeg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://research.manchester.ac.uk/en/persons/sophia.ananiadou" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="KP" style="--h:120">
+<header><div class="av" aria-hidden="true">SM</div><div class="who"><h3>Stefano Moriconi</h3><p class="aff">Lead Innovation Expert, AI &amp; Digital Twin, ZEISS Medical Technology</p></div></header>
+<ul class="kw"><li>Surgical digital twins</li><li>neurovascular imaging</li><li>surgical robotics</li></ul>
+<p class="hook">Lists NVIDIA Clara Holoscan among his collaborations.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Kimberly Powell</strong><span class="bk">backup: Chris Paulson</span><p>Holoscan / surgical digital twins: healthcare platform talk.</p></div>
+<p class="flag">Now industry (ZEISS), not academic.</p><footer><a href="https://stefanomoriconi.github.io/mypage/imgs/PhotoCV.png" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://stefanomoriconi.github.io/mypage/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="VS" style="--h:160">
+<header><div class="av" aria-hidden="true">AM</div><div class="who"><h3>André Martins</h3><p class="aff">Associate Professor, IST Lisbon / Instituto de Telecomunicações</p></div></header>
+<ul class="kw"><li>Multilingual LLMs (EuroLLM)</li><li>machine translation</li><li>sparse attention</li></ul>
+<p class="hook">Leads EuroLLM (22B trained on MareNostrum 5 H100s); Tower, xCOMET, sparsemax; EuroHPC RIAG.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Vartika Singh</strong><span class="bk">backup: Andy Grant</span><p>Sovereign LLM training with NeMo; sit with Treviso (same lab).</p></div>
+<p class="flag">&#x27;Gandara AI&#x27; CSO role unverified; photo ~2015.</p><footer><a href="https://www.acad-ciencias.pt/wp-content/uploads/2024/12/andre_beijing_cropped-1-2.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.acad-ciencias.pt/eng/scholars/andre-filipe-torres-martins/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="VS" style="--h:160">
+<header><div class="av" aria-hidden="true">MT</div><div class="who"><h3>Marcos Treviso</h3><p class="aff">Assistant Professor, Instituto Superior Técnico, Univ. of Lisbon</p></div></header>
+<ul class="kw"><li>Sparse attention</li><li>efficient LLMs</li><li>GPU kernels</li></ul>
+<p class="hook">Author of AdaSplash sparse-attention Triton kernels (beat FlashAttention-2 at high sparsity); ACL&#x27;25 Outstanding Paper.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Vartika Singh</strong><span class="bk">backup: Kieran Didi</span><p>Kernel/compiler-level LLM efficiency fits frameworks &amp; compilers partnerships.</p></div>
+<footer><a href="https://mtreviso.github.io/profile.png" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://mtreviso.github.io/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="VS" style="--h:160">
+<header><div class="av" aria-hidden="true">MA</div><div class="who"><h3>Mehdi Ali</h3><p class="aff">Innovation Group Leader, Foundation Models, Lamarr Institute / Fraunhofer IAIS</p></div></header>
+<ul class="kw"><li>Multilingual LLMs</li><li>multimodal reasoning</li><li>world models</li></ul>
+<p class="hook">Core researcher on Teuken-7B; works on OpenEuroLLM, TrustLLM and SOOFI; created PyKEEN.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Vartika Singh</strong><span class="bk">backup: Andy Grant</span><p>European LLM training stack (NeMo, Megatron); sit with Fromm.</p></div>
+<footer><a href="https://lamarr-institute.org/wp-content/uploads/Mehdi-Ali-NLP-Lamarr-Canada.png" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://lamarr-institute.org/person/ali-mehdi/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="VS" style="--h:160">
+<header><div class="av" aria-hidden="true">MF</div><div class="who"><h3>Michael Fromm</h3><p class="aff">Head of Pretraining Data, Fraunhofer IAIS</p></div></header>
+<ul class="kw"><li>LLM pretraining data</li><li>multilingual corpora</li><li>sovereign open LLMs</li></ul>
+<p class="hook">Led data for Teuken-7B; tech lead on Soofi S (30B, built on Nemotron 3 Nano architecture, trained on B200s).</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Vartika Singh</strong><span class="bk">backup: Andy Grant</span><p>Already building on Nemotron: Nemotron data recipes, NeMo Curator.</p></div>
+<p class="flag">No public photo found.</p><footer><span class="muted">No public photo found</span></footer></article>
+<article class="card" data-host="KD" style="--h:200">
+<header><div class="av" aria-hidden="true">GP</div><div class="who"><h3>Grzegorz Popowicz</h3><p class="aff">Group Leader, Structure-based Drug Discovery, Helmholtz Munich; CSO Khumbu.AI</p></div></header>
+<ul class="kw"><li>AI drug discovery</li><li>protein–ligand interactions</li><li>quantum chemistry</li></ul>
+<p class="hook">Combines AI and QM for drug discovery; startup claims interaction prediction beyond AlphaFold3.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Kieran Didi</strong><span class="bk">backup: Kimberly Powell</span><p>Protein–ligand generative modelling; BioNeMo, cuEquivariance, GPU docking.</p></div>
+<footer><a href="https://images.admiralcloud.com/v5/deliverEmbed/d23ddf9e-c6aa-4d12-a792-7d80e634d40b/image_webp/cropperjsfocus/1262/702/14.080327943313954,126.00422703942587,1262.5792037609012,702.7483846974927,0,1,1/568.9839862810812,290.57413546033075?poc=true" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.helmholtz-munich.de/en/stb/grzegorz-popowicz" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="KD" style="--h:200">
+<header><div class="av" aria-hidden="true">NF</div><div class="who"><h3>Noelia Ferruz</h3><p class="aff">Group Leader, AI for Protein Design, Centre for Genomic Regulation (CRG)</p></div></header>
+<ul class="kw"><li>Protein language models</li><li>generative protein &amp; enzyme design</li></ul>
+<p class="hook">Creator of ProtGPT2 and ZymCTRL; now building ATHENA for new-to-nature proteins.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Kieran Didi</strong><span class="bk">backup: Kimberly Powell</span><p>Direct overlap with Kieran&#x27;s Proteina work; BioNeMo.</p></div>
+<footer><a href="https://www.crg.eu/sites/default/files/programme_taxonomy/noelia_ferruz.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.crg.eu/ca/programmes-groups/ferruz-lab" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="KD" style="--h:200">
+<header><div class="av" aria-hidden="true">PC</div><div class="who"><h3>Peter Coveney</h3><p class="aff">Professor &amp; Director, Centre for Computational Science, UCL</p></div></header>
+<ul class="kw"><li>Exascale simulation</li><li>virtual human digital twins</li><li>molecular dynamics</li><li>quantum computing</li></ul>
+<p class="hook">HemeLB, CompBioMed; ensemble MD for drug binding with UQ; quantum computing at UvA.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Kieran Didi</strong><span class="bk">backup: Judit Szulágyi</span><p>Ensemble MD for drug binding meets Kieran&#x27;s molecular AI; you for exascale simulation.</p></div>
+<footer><a href="https://www.ucl.ac.uk/mathematical-physical-sciences/sites/mathematical_physical_sciences/files/styles/wysiwyg_mobile/public/pvc_0.jpeg.jpg?itok=Kj-vm_Wx" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.ucl.ac.uk/mathematical-physical-sciences/prof-peter-coveney" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AG" style="--h:240">
+<header><div class="av" aria-hidden="true">CF</div><div class="who"><h3>Cristian Canton Ferrer</h3><p class="aff">Associate Director, Barcelona Supercomputing Center</p></div></header>
+<ul class="kw"><li>HPC &amp; AI strategy</li><li>AI safety / red teaming</li><li>deepfake detection</li></ul>
+<p class="hook">Ex-Meta AI Red Team lead; oversees MareNostrum 5 and planning for MareNostrum 6.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Andy Grant</strong><span class="bk">backup: Tomasz Bednarz</span><p>Same account as Valero: MareNostrum roadmap.</p></div>
+<p class="flag">Registered as &#x27;Director and professor&#x27;; sources say Associate Director.</p><footer><a href="https://new-european-bauhaus.europa.eu/sites/default/files/styles/oe_theme_medium_no_crop/public/2026-04/Speaker%27s%20Pictures__CANTON_Cristian.png?itok=lDcX9ME4" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://new-european-bauhaus.europa.eu/festival/forum-2026/speakers/cristian-canton_en" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AG" style="--h:240">
+<header><div class="av" aria-hidden="true">DB</div><div class="who"><h3>David Barber</h3><p class="aff">Professor of Machine Learning, UCL; Director, SOFAIR</p></div></header>
+<ul class="kw"><li>Probabilistic ML</li><li>open foundation models</li><li>distributed training</li></ul>
+<p class="hook">Leads SOFAIR (UCL/Cambridge/Edinburgh/Oxford) building open frontier models and a federated &#x27;AI Grid&#x27;; FREng 2026.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Andy Grant</strong><span class="bk">backup: Vartika Singh</span><p>SOFAIR needs large UK compute: an AI Factory/supercomputing conversation.</p></div>
+<footer><a href="https://raeng.org.uk/media/1y5drzyp/barber-david-fellow-2026-500x450.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://raeng.org.uk/about-us/fellowship/new-fellows-2026/professor-david-barber-freng/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AG" style="--h:240">
+<header><div class="av" aria-hidden="true">FF</div><div class="who"><h3>Filipe Ferreira</h3><p class="aff">Principal Research Fellow &amp; UKRI Future Leaders Fellow, UCL Optical Networks</p></div></header>
+<ul class="kw"><li>Optical communications</li><li>photonic processors</li><li>ML for optics</li></ul>
+<p class="hook">Fellowship &#x27;Beyond Exabit Optical Communications&#x27;: thousands of parallel paths per fibre.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Andy Grant</strong><span class="bk">backup: Tomasz Bednarz</span><p>UK account; silicon photonics and co-packaged optics for AI data centres. Andy can route to networking.</p></div>
+<footer><a href="https://www.ucl.ac.uk/engineering/sites/engineering/files/styles/wysiwyg_mobile/public/filipe_ferreira_profile_pic_ong_web.png.jpg?itok=jlSN3Pfm" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.ucl.ac.uk/engineering/electronic-electrical-engineering/research/optical-networks-group/about-us" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AG" style="--h:240">
+<header><div class="av" aria-hidden="true">GR</div><div class="who"><h3>Geraint Rees</h3><p class="aff">Vice-Provost (Research, Innovation &amp; Global Engagement), UCL</p></div></header>
+<ul class="kw"><li>Cognitive neuroscience</li><li>neuroimaging</li><li>ML in healthcare</li><li>research strategy</li></ul>
+<p class="hook">Neurologist, ex-DeepMind advisor; sets UCL research strategy; Turing &amp; Crick boards.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Andy Grant</strong><span class="bk">backup: Kimberly Powell</span><p>Sets UCL&#x27;s research and compute strategy: an institution-level UK conversation for Andy; Kimberly for his healthcare-AI side.</p></div>
+<p class="flag">Senior leader.</p><footer><a href="https://www.ucl.ac.uk/research/sites/research/files/styles/large_image/public/120_17_0003_ucl_geraint_rees_portait_1109.jpg?itok=tpC7Dcfs" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.ucl.ac.uk/research/professor-geraint-rees-ucl-vice-provost-research-innovation-global-engagement" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AG" style="--h:240">
+<header><div class="av" aria-hidden="true">MV</div><div class="who"><h3>Mateo Valero</h3><p class="aff">Founding Director, Barcelona Supercomputing Center; Professor, UPC</p></div></header>
+<ul class="kw"><li>Computer architecture</li><li>supercomputing</li><li>RISC-V</li><li>EU chip sovereignty</li></ul>
+<p class="hook">Runs MareNostrum (MN5 has H100 partition); pushing European RISC-V chips for MareNostrum 6. VIP.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Andy Grant</strong><span class="bk">backup: Tomasz Bednarz</span><p>Strategic supercomputing account; seat with Cristian Canton.</p></div>
+<p class="flag">VIP.</p><footer><a href="https://www.hpcwire.com/wp-content/uploads/2025/07/mateo_valero_400x500.png" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.hpcwire.com/35-hpc-legends-mateo-valero-cortes/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AM" style="--h:280">
+<header><div class="av" aria-hidden="true">CD</div><div class="who"><h3>Cheng Deng</h3><p class="aff">Research Fellow, Bayes Centre, Univ. of Edinburgh</p></div></header>
+<ul class="kw"><li>On-device LLMs</li><li>efficient VLA</li><li>hardware–model co-design</li></ul>
+<p class="hook">PhysicalAgent home robot runs on Jetson Orin; papers at NeurIPS/CoRL/MLSys 2026.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Amit Goel</strong><span class="bk">backup: Vartika Singh</span><p>Jetson-based embodied AI.</p></div>
+<p class="flag">Postdoc.</p><footer><a href="https://www.cdeng.net/assets/img/dc.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.cdeng.net/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AM" style="--h:280">
+<header><div class="av" aria-hidden="true">HA</div><div class="who"><h3>Hussam Amrouch</h3><p class="aff">Full Professor, Chair of AI Processor Design, TU Munich</p></div></header>
+<ul class="kw"><li>AI processor design</li><li>neuromorphic &amp; in-memory computing</li><li>chip reliability</li></ul>
+<p class="hook">Led TUM&#x27;s 7nm RISC-V neuromorphic chip (Feb 2026); set up MACHT-AI chip center.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Amit Goel</strong><span class="bk">backup: Vartika Singh</span><p>Amit&#x27;s Synopsys/EDA background; AI-for-EDA and edge efficiency.</p></div>
+<footer><a href="https://www.ce.cit.tum.de/fileadmin/_processed_/8/f/csm_Amrouch_photo_293905c63c.webp" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.ce.cit.tum.de/en/aipro/team/hussam-amrouch/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AM" style="--h:280">
+<header><div class="av" aria-hidden="true">KA</div><div class="who"><h3>Kostas Alexis</h3><p class="aff">Professor, NTNU; Head, Autonomous Robots Lab</p></div></header>
+<ul class="kw"><li>Aerial &amp; field robotics</li><li>resilient autonomy</li><li>RL sim2real</li></ul>
+<p class="hook">Led DARPA SubT-winning Team CERBERUS; built Aerial Gym on Isaac Gym.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Amit Goel</strong><span class="bk">backup: Chris Paulson</span><p>Existing Isaac Gym user: natural Isaac Lab migration and Jetson deployment talk.</p></div>
+<footer><a href="https://backends.it.ntnu.no/user-profile-service/rest/files/9f9c50f3-1be4-3823-a318-e8e53ab77d85" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.ntnu.edu/employees/konstantinos.alexis" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="AM" style="--h:280">
+<header><div class="av" aria-hidden="true">VR</div><div class="who"><h3>Vijay Janapa Reddi</h3><p class="aff">Gordon McKay Professor of EE, Harvard; MLCommons co-founder</p></div></header>
+<ul class="kw"><li>TinyML</li><li>ML systems</li><li>MLPerf</li><li>edge AI</li></ul>
+<p class="hook">Co-founded MLPerf; created Harvard/edX TinyML program.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Amit Goel</strong><span class="bk">backup: Max Starubinskiy</span><p>Edge/Jetson and MLPerf; Max for his TinyML courseware.</p></div>
+<footer><a href="https://edge.seas.harvard.edu/sites/g/files/omnuum6351/files/edge/files/vijay2.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://edge.seas.harvard.edu/people/vijay-janapa-reddi" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="CP" style="--h:320">
+<header><div class="av" aria-hidden="true">AD</div><div class="who"><h3>Andrew Davison</h3><p class="aff">Professor of Robot Vision &amp; Director, Dyson Robotics Lab, Imperial</p></div></header>
+<ul class="kw"><li>Visual SLAM</li><li>Spatial AI</li><li>Gaussian splatting</li></ul>
+<p class="hook">MonoSLAM pioneer; Gaussian Splatting SLAM (CVPR&#x27;24 best demo); several alumni at NVIDIA Research.</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Chris Paulson</strong><span class="bk">backup: Tomasz Bednarz</span><p>Spatial AI for robots; Tomasz for 3D/graphics angle.</p></div>
+<footer><a href="https://profiles.imperial.ac.uk/a.davison/thumbnail" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://profiles.imperial.ac.uk/a.davison" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="CP" style="--h:320">
+<header><div class="av" aria-hidden="true">CC</div><div class="who"><h3>Cesar Cadena</h3><p class="aff">Senior Scientist (Robotic Systems Lab) &amp; Managing Director RobotX, ETH Zurich</p></div></header>
+<ul class="kw"><li>Robot perception</li><li>SLAM &amp; semantic mapping</li><li>legged navigation</li></ul>
+<p class="hook">Leads perception &amp; navigation for ANYmal in Hutter&#x27;s lab, a heavy Isaac Sim/Lab user (Orbit origin).</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Chris Paulson</strong><span class="bk">backup: Amit Goel</span><p>Legged-robot perception and Isaac Lab ecosystem.</p></div>
+<footer><a href="https://rsl.ethz.ch/the-lab/people/_jcr_content/par/textimage_2093071237/image.imageformat.textdouble.1730650738.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://rsl.ethz.ch/the-lab/people.html" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="CP" style="--h:320">
+<header><div class="av" aria-hidden="true">MC</div><div class="who"><h3>Matthieu Cord</h3><p class="aff">Professor, Sorbonne Université; Director, valeo.ai</p></div></header>
+<ul class="kw"><li>Vision-language models</li><li>driving world models</li><li>VLA</li></ul>
+<p class="hook">Co-author of DeiT, IDEFICS2, SmolVLA; leads valeo.ai driving foundation models (VaViM/VaVaM).</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Chris Paulson</strong><span class="bk">backup: Amit Goel</span><p>VLA and driving world models map to physical AI (Cosmos, Isaac GR00T).</p></div>
+<footer><a href="https://cord.isir.upmc.fr/images/photo.png" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://cord.isir.upmc.fr/" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+<article class="card" data-host="CP" style="--h:320">
+<header><div class="av" aria-hidden="true">VP</div><div class="who"><h3>Vishnuu Jothi Prakash</h3><p class="aff">Team Lead, Digital Twins, Fraunhofer IAPT (Hamburg)</p></div></header>
+<ul class="kw"><li>Manufacturing digital twins</li><li>additive manufacturing</li><li>RL robot control</li></ul>
+<p class="hook">Real-time digital twins for 3D printing; RL agents controlling robotic printing (KiRo3D).</p>
+<div class="match"><span class="lbl">Talk to</span><strong>Chris Paulson</strong><span class="bk">backup: Tomasz Bednarz</span><p>Robotic manufacturing + Omniverse/Isaac digital twins.</p></div>
+<p class="flag">Photo from 2019.</p><footer><a href="https://www.iapt.fraunhofer.de/content/businesscards/IAPT/vishnuu-jothi-prakash/jcr:content/businesscard/image.img.1col.jpg/1779219561841/Vishnuu-Jothi-Prakash-IAPT-07-08-2019-53A5497.jpg" target="_blank" rel="noopener">Photo ↗</a> · <a href="https://www.iapt.fraunhofer.de/en/Competences/digital-twin.html" target="_blank" rel="noopener">Profile ↗</a></footer></article>
+</div>
+</section>
+<section class="notes">
+<p>Photos: each card links to the person's most recent public headshot (institutional profile where possible). Photos can't be embedded directly yet; the "Photo" link opens each one.</p>
+<p>Chris Paulson: no public profile found, so his robotics pairings rely on the "Robotics" tag in the attendance list; Amit Goel is the backup for each. Vartika Singh's public NVIDIA bio covers DL frameworks and compilers partnerships, so she is paired with the LLM researchers. Andy Grant (Sales, UK) takes the UK institution-level conversations.</p>
+<p>Updated 16 October 2026 from the latest attendance list. Research compiled from public web sources.</p>
+</section>
+</div>
+<script>
+(function(){
+  const btns=[...document.querySelectorAll('.tbl')], cards=[...document.querySelectorAll('.card')], reset=document.getElementById('reset'), count=document.getElementById('count');
+  let cur=null;
+  function apply(){
+    let n=0;
+    cards.forEach(c=>{const show=!cur||c.dataset.host===cur;c.hidden=!show;if(show)n++;});
+    btns.forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.host===cur)));
+    reset.hidden=!cur;
+    count.textContent=cur?`${n} researchers for ${btns.find(b=>b.dataset.host===cur).querySelector('.hn').textContent}`:`${n} researchers, grouped by host`;
+  }
+  btns.forEach(b=>b.addEventListener('click',()=>{cur=cur===b.dataset.host?null:b.dataset.host;apply();}));
+  reset.addEventListener('click',()=>{cur=null;apply();});
+  apply();
+})();
+</script>
